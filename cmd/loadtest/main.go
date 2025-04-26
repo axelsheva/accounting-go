@@ -25,7 +25,7 @@ const (
 var (
 	numUsers        = flag.Int("users", 100, "Number of users to create")
 	numTransactions = flag.Int("transactions", 1000, "Number of transactions per user")
-	concurrency     = flag.Int("concurrency", 10, "Number of concurrent goroutines")
+	concurrency     = flag.Int("concurrency", 50, "Number of concurrent goroutines")
 	verbose         = flag.Bool("verbose", false, "Enable verbose output")
 	baseURL         = flag.String("url", apiBaseURL, "Base URL for the API")
 )
@@ -343,27 +343,37 @@ func main() {
 	successRate := float64(userMetrics.SuccessfulRequests+txMetrics.SuccessfulRequests) / float64(totalRequests) * 100
 	rps := float64(totalRequests) / totalTime.Seconds()
 
-	fmt.Println("\n=== LOAD TESTING RESULTS ===")
-	fmt.Printf("Total execution time: %s\n", totalTime)
-	fmt.Printf("Total requests: %d (Users: %d, Transactions: %d)\n",
+	// Output the results in markdown format
+	fmt.Println("\n### General Results")
+	fmt.Println()
+	fmt.Println("| Metric                    | Value                                     |")
+	fmt.Println("| ------------------------- | ----------------------------------------- |")
+	fmt.Printf("| Total execution time      | %s                             |\n", totalTime)
+	fmt.Printf("| Total requests            | %d (Users: %d, Transactions: %d) |\n",
 		totalRequests, userMetrics.TotalRequests, txMetrics.TotalRequests)
-	fmt.Printf("Successful requests: %d (%.2f%%)\n",
+	fmt.Printf("| Successful requests       | %d (%.2f%%)                          |\n",
 		userMetrics.SuccessfulRequests+txMetrics.SuccessfulRequests, successRate)
-	fmt.Printf("Failed requests: %d (%.2f%%)\n",
+	fmt.Printf("| Failed requests           | %d (%.2f%%)                               |\n",
 		userMetrics.FailedRequests+txMetrics.FailedRequests, 100-successRate)
-	fmt.Printf("Requests per second (RPS): %.2f\n", rps)
+	fmt.Printf("| Requests per second (RPS) | %.2f                                   |\n", rps)
 
-	fmt.Println("\n--- User creation request metrics ---")
-	fmt.Printf("Average response time: %s\n", userAvgTime)
-	fmt.Printf("Minimum response time: %s\n", userMetrics.MinResponseTime)
-	fmt.Printf("Maximum response time: %s\n", userMetrics.MaxResponseTime)
-	fmt.Printf("Response time percentiles: P50=%s, P90=%s, P95=%s, P99=%s\n",
+	fmt.Println("\n### User Creation Request Metrics")
+	fmt.Println()
+	fmt.Println("| Metric                    | Value                                                       |")
+	fmt.Println("| ------------------------- | ----------------------------------------------------------- |")
+	fmt.Printf("| Average response time     | %s                                                     |\n", userAvgTime)
+	fmt.Printf("| Minimum response time     | %s                                                    |\n", userMetrics.MinResponseTime)
+	fmt.Printf("| Maximum response time     | %s                                                  |\n", userMetrics.MaxResponseTime)
+	fmt.Printf("| Response time percentiles | P50=%s, P90=%s, P95=%s, P99=%s |\n",
 		userPercentiles["p50"], userPercentiles["p90"], userPercentiles["p95"], userPercentiles["p99"])
 
-	fmt.Println("\n--- Transaction creation request metrics ---")
-	fmt.Printf("Average response time: %s\n", txAvgTime)
-	fmt.Printf("Minimum response time: %s\n", txMetrics.MinResponseTime)
-	fmt.Printf("Maximum response time: %s\n", txMetrics.MaxResponseTime)
-	fmt.Printf("Response time percentiles: P50=%s, P90=%s, P95=%s, P99=%s\n",
+	fmt.Println("\n### Transaction Creation Request Metrics")
+	fmt.Println()
+	fmt.Println("| Metric                    | Value                                                       |")
+	fmt.Println("| ------------------------- | ----------------------------------------------------------- |")
+	fmt.Printf("| Average response time     | %s                                                     |\n", txAvgTime)
+	fmt.Printf("| Minimum response time     | %s                                                    |\n", txMetrics.MinResponseTime)
+	fmt.Printf("| Maximum response time     | %s                                                  |\n", txMetrics.MaxResponseTime)
+	fmt.Printf("| Response time percentiles | P50=%s, P90=%s, P95=%s, P99=%s |\n",
 		txPercentiles["p50"], txPercentiles["p90"], txPercentiles["p95"], txPercentiles["p99"])
 }

@@ -18,6 +18,14 @@
 | Go Version | go1.24.2 darwin/arm64                          |
 | Database   | PostgreSQL 16 (Docker container, alpine image) |
 
+### Parameters
+
+| Key          | Value |
+| ------------ | ----- |
+| users        | 100   |
+| transactions | 1000  |
+| concurrency  | 10    |
+
 ## Test 1
 
 ### General Results
@@ -89,5 +97,3 @@
 - **Total execution time reduction**: 35.5%
 - **RPS increase**: 55.0%
 - **Transaction response time improvement**: from 4.53ms to 2.93ms (35.3%)
-
-## TODO: Add test 3 using MacBook Pro for traffic generation and iMac for API server to split CPU usage
