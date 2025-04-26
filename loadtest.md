@@ -1,5 +1,23 @@
 # Load Testing Report
 
+## Test Environment
+
+### Hardware Specifications
+
+| Component | Specification                                  |
+| --------- | ---------------------------------------------- |
+| CPU       | Apple M4, 10 physical cores, 10 logical cores  |
+| Memory    | 24 GB (25769803776 bytes)                      |
+| Storage   | 460 GB SSD (10 GB used, 283 GB available)      |
+| OS        | macOS Darwin Kernel 24.4.0, ARM64 architecture |
+
+### Software Specifications
+
+| Component  | Specification                                  |
+| ---------- | ---------------------------------------------- |
+| Go Version | go1.24.2 darwin/arm64                          |
+| Database   | PostgreSQL 16 (Docker container, alpine image) |
+
 ## Test 1
 
 ### General Results
