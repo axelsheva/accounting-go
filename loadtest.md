@@ -89,3 +89,5 @@
 - **Total execution time reduction**: 35.5%
 - **RPS increase**: 55.0%
 - **Transaction response time improvement**: from 4.53ms to 2.93ms (35.3%)
+
+## TODO: Add test 3 using MacBook Pro for traffic generation and iMac for API server to split CPU usage
