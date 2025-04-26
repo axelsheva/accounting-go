@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"db/ent"
-	"db/ent/balance"
-	"db/ent/user"
-	"db/errors"
+	"accounting/ent"
+	"accounting/ent/balance"
+	"accounting/ent/user"
+	"accounting/errors"
 )
 
 // BalanceRepository represents a repository for working with balances

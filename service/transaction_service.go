@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
-	"db/ent"
-	"db/ent/transaction"
-	"db/repository"
+	"accounting/ent"
+	"accounting/ent/transaction"
+	"accounting/repository"
 	"errors"
 	"fmt"
 

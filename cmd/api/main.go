@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	"db/api"
-	"db/ent"
+	"accounting/api"
+	"accounting/ent"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/gin-gonic/gin"
@@ -30,10 +30,10 @@ func main() {
 	}
 
 	// Configure connection pool
-	db := drv.DB()
-	db.SetMaxOpenConns(100)          // Maximum number of open connections
-	db.SetMaxIdleConns(50)           // Maximum number of idle connections
-	db.SetConnMaxLifetime(time.Hour) // Maximum connection lifetime
+	accounting := drv.DB()
+	accounting.SetMaxOpenConns(100)          // Maximum number of open connections
+	accounting.SetMaxIdleConns(50)           // Maximum number of idle connections
+	accounting.SetConnMaxLifetime(time.Hour) // Maximum connection lifetime
 
 	// Create an ent client
 	client := ent.NewClient(ent.Driver(drv))

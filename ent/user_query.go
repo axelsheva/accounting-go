@@ -5,10 +5,10 @@ package ent
 import (
 	"context"
 	"database/sql/driver"
-	"db/ent/balance"
-	"db/ent/predicate"
-	"db/ent/transaction"
-	"db/ent/user"
+	"accounting/ent/balance"
+	"accounting/ent/predicate"
+	"accounting/ent/transaction"
+	"accounting/ent/user"
 	"fmt"
 	"math"
 

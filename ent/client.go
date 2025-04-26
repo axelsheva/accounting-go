@@ -9,11 +9,11 @@ import (
 	"log"
 	"reflect"
 
-	"db/ent/migrate"
+	"accounting/ent/migrate"
 
-	"db/ent/balance"
-	"db/ent/transaction"
-	"db/ent/user"
+	"accounting/ent/balance"
+	"accounting/ent/transaction"
+	"accounting/ent/user"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"

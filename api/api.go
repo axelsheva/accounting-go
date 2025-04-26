@@ -1,9 +1,9 @@
 package api
 
 import (
-	"db/api/handler"
-	"db/ent"
-	"db/service"
+	"accounting/api/handler"
+	"accounting/ent"
+	"accounting/service"
 
 	"github.com/gin-gonic/gin"
 )

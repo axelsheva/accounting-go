@@ -4,8 +4,8 @@ package ent
 
 import (
 	"context"
-	"db/ent/transaction"
-	"db/ent/user"
+	"accounting/ent/transaction"
+	"accounting/ent/user"
 	"errors"
 	"fmt"
 	"time"

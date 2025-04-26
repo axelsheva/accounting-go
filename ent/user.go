@@ -3,7 +3,7 @@
 package ent
 
 import (
-	"db/ent/user"
+	"accounting/ent/user"
 	"fmt"
 	"strings"
 	"time"

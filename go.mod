@@ -1,4 +1,4 @@
-module db
+module accounting
 
 go 1.24.2
 

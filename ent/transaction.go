@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"db/ent/transaction"
-	"db/ent/user"
+	"accounting/ent/transaction"
+	"accounting/ent/user"
 	"fmt"
 	"strings"
 	"time"

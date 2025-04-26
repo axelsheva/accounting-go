@@ -4,10 +4,10 @@ package ent
 
 import (
 	"context"
-	"db/ent/balance"
-	"db/ent/predicate"
-	"db/ent/transaction"
-	"db/ent/user"
+	"accounting/ent/balance"
+	"accounting/ent/predicate"
+	"accounting/ent/transaction"
+	"accounting/ent/user"
 	"errors"
 	"fmt"
 	"sync"

@@ -4,7 +4,7 @@ package hook
 
 import (
 	"context"
-	"db/ent"
+	"accounting/ent"
 	"fmt"
 )
 

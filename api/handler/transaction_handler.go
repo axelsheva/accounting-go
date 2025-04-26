@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"db/ent/transaction"
-	"db/service"
+	"accounting/ent/transaction"
+	"accounting/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"db/ent"
-	"db/ent/transaction"
-	"db/ent/user"
+	"accounting/ent"
+	"accounting/ent/transaction"
+	"accounting/ent/user"
 )
 
 // TransactionRepository presents a repository for working with transactions

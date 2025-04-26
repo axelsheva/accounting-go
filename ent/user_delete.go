@@ -4,8 +4,8 @@ package ent
 
 import (
 	"context"
-	"db/ent/predicate"
-	"db/ent/user"
+	"accounting/ent/predicate"
+	"accounting/ent/user"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

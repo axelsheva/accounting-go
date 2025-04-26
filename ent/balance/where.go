@@ -3,7 +3,7 @@
 package balance
 
 import (
-	"db/ent/predicate"
+	"accounting/ent/predicate"
 	"time"
 
 	"entgo.io/ent/dialect/sql"

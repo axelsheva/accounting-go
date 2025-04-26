@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"db/service"
+	"accounting/service"
 
 	"github.com/gin-gonic/gin"
 	jsoniter "github.com/json-iterator/go"

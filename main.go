@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"db/ent"
-	"db/service"
+	"accounting/ent"
+	"accounting/service"
 
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"

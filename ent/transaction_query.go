@@ -4,9 +4,9 @@ package ent
 
 import (
 	"context"
-	"db/ent/predicate"
-	"db/ent/transaction"
-	"db/ent/user"
+	"accounting/ent/predicate"
+	"accounting/ent/transaction"
+	"accounting/ent/user"
 	"fmt"
 	"math"
 

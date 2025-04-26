@@ -3,10 +3,10 @@
 package ent
 
 import (
-	"db/ent/balance"
-	"db/ent/schema"
-	"db/ent/transaction"
-	"db/ent/user"
+	"accounting/ent/balance"
+	"accounting/ent/schema"
+	"accounting/ent/transaction"
+	"accounting/ent/user"
 	"time"
 )
 

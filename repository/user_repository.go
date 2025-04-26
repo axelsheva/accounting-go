@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"db/ent"
-	"db/ent/user"
+	"accounting/ent"
+	"accounting/ent/user"
 
 	"github.com/google/uuid"
 )
