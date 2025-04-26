@@ -4,7 +4,7 @@
   "dictionaryDefinitions": [],
   "dictionaries": [],
   "language": "en,ru,uk",
-  "words": ["Nillable", "sqlgraph", "entsql"],
+  "words": ["Nillable", "sqlgraph", "entsql", "gonic"],
   "ignoreWords": ["entgo", "healthcheck", "pg_isready", "sslmode", "upserting"],
   "import": []
 }
