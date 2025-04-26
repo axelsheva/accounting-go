@@ -54,12 +54,8 @@ var (
 		{Name: "id", Type: field.TypeString},
 		{Name: "amount", Type: field.TypeFloat64},
 		{Name: "currency", Type: field.TypeString, Default: "USD"},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"deposit", "withdrawal", "transfer"}},
-		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "status", Type: field.TypeString, Default: "pending"},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"deposit", "withdrawal"}},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "completed_at", Type: field.TypeTime, Nullable: true},
 		{Name: "user_id", Type: field.TypeInt},
 	}
 	// TransactionsTable holds the schema information for the "transactions" table.
@@ -70,7 +66,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "transactions_users_transactions",
-				Columns:    []*schema.Column{TransactionsColumns[9]},
+				Columns:    []*schema.Column{TransactionsColumns[5]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -79,22 +75,12 @@ var (
 			{
 				Name:    "transaction_user_id",
 				Unique:  false,
-				Columns: []*schema.Column{TransactionsColumns[9]},
+				Columns: []*schema.Column{TransactionsColumns[5]},
 			},
 			{
 				Name:    "transaction_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{TransactionsColumns[6]},
-			},
-			{
-				Name:    "transaction_status",
-				Unique:  false,
-				Columns: []*schema.Column{TransactionsColumns[5]},
-			},
-			{
-				Name:    "transaction_user_id_status",
-				Unique:  false,
-				Columns: []*schema.Column{TransactionsColumns[9], TransactionsColumns[5]},
+				Columns: []*schema.Column{TransactionsColumns[4]},
 			},
 		},
 	}

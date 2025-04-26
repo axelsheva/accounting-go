@@ -9,7 +9,6 @@ import (
 	"db/ent/user"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -92,66 +91,6 @@ func (tu *TransactionUpdate) SetNillableType(t *transaction.Type) *TransactionUp
 	return tu
 }
 
-// SetDescription sets the "description" field.
-func (tu *TransactionUpdate) SetDescription(s string) *TransactionUpdate {
-	tu.mutation.SetDescription(s)
-	return tu
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (tu *TransactionUpdate) SetNillableDescription(s *string) *TransactionUpdate {
-	if s != nil {
-		tu.SetDescription(*s)
-	}
-	return tu
-}
-
-// ClearDescription clears the value of the "description" field.
-func (tu *TransactionUpdate) ClearDescription() *TransactionUpdate {
-	tu.mutation.ClearDescription()
-	return tu
-}
-
-// SetStatus sets the "status" field.
-func (tu *TransactionUpdate) SetStatus(s string) *TransactionUpdate {
-	tu.mutation.SetStatus(s)
-	return tu
-}
-
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (tu *TransactionUpdate) SetNillableStatus(s *string) *TransactionUpdate {
-	if s != nil {
-		tu.SetStatus(*s)
-	}
-	return tu
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (tu *TransactionUpdate) SetUpdatedAt(t time.Time) *TransactionUpdate {
-	tu.mutation.SetUpdatedAt(t)
-	return tu
-}
-
-// SetCompletedAt sets the "completed_at" field.
-func (tu *TransactionUpdate) SetCompletedAt(t time.Time) *TransactionUpdate {
-	tu.mutation.SetCompletedAt(t)
-	return tu
-}
-
-// SetNillableCompletedAt sets the "completed_at" field if the given value is not nil.
-func (tu *TransactionUpdate) SetNillableCompletedAt(t *time.Time) *TransactionUpdate {
-	if t != nil {
-		tu.SetCompletedAt(*t)
-	}
-	return tu
-}
-
-// ClearCompletedAt clears the value of the "completed_at" field.
-func (tu *TransactionUpdate) ClearCompletedAt() *TransactionUpdate {
-	tu.mutation.ClearCompletedAt()
-	return tu
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (tu *TransactionUpdate) SetUser(u *User) *TransactionUpdate {
 	return tu.SetUserID(u.ID)
@@ -170,7 +109,6 @@ func (tu *TransactionUpdate) ClearUser() *TransactionUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (tu *TransactionUpdate) Save(ctx context.Context) (int, error) {
-	tu.defaults()
 	return withHooks(ctx, tu.sqlSave, tu.mutation, tu.hooks)
 }
 
@@ -193,14 +131,6 @@ func (tu *TransactionUpdate) Exec(ctx context.Context) error {
 func (tu *TransactionUpdate) ExecX(ctx context.Context) {
 	if err := tu.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (tu *TransactionUpdate) defaults() {
-	if _, ok := tu.mutation.UpdatedAt(); !ok {
-		v := transaction.UpdateDefaultUpdatedAt()
-		tu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -240,24 +170,6 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := tu.mutation.GetType(); ok {
 		_spec.SetField(transaction.FieldType, field.TypeEnum, value)
-	}
-	if value, ok := tu.mutation.Description(); ok {
-		_spec.SetField(transaction.FieldDescription, field.TypeString, value)
-	}
-	if tu.mutation.DescriptionCleared() {
-		_spec.ClearField(transaction.FieldDescription, field.TypeString)
-	}
-	if value, ok := tu.mutation.Status(); ok {
-		_spec.SetField(transaction.FieldStatus, field.TypeString, value)
-	}
-	if value, ok := tu.mutation.UpdatedAt(); ok {
-		_spec.SetField(transaction.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := tu.mutation.CompletedAt(); ok {
-		_spec.SetField(transaction.FieldCompletedAt, field.TypeTime, value)
-	}
-	if tu.mutation.CompletedAtCleared() {
-		_spec.ClearField(transaction.FieldCompletedAt, field.TypeTime)
 	}
 	if tu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -371,66 +283,6 @@ func (tuo *TransactionUpdateOne) SetNillableType(t *transaction.Type) *Transacti
 	return tuo
 }
 
-// SetDescription sets the "description" field.
-func (tuo *TransactionUpdateOne) SetDescription(s string) *TransactionUpdateOne {
-	tuo.mutation.SetDescription(s)
-	return tuo
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (tuo *TransactionUpdateOne) SetNillableDescription(s *string) *TransactionUpdateOne {
-	if s != nil {
-		tuo.SetDescription(*s)
-	}
-	return tuo
-}
-
-// ClearDescription clears the value of the "description" field.
-func (tuo *TransactionUpdateOne) ClearDescription() *TransactionUpdateOne {
-	tuo.mutation.ClearDescription()
-	return tuo
-}
-
-// SetStatus sets the "status" field.
-func (tuo *TransactionUpdateOne) SetStatus(s string) *TransactionUpdateOne {
-	tuo.mutation.SetStatus(s)
-	return tuo
-}
-
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (tuo *TransactionUpdateOne) SetNillableStatus(s *string) *TransactionUpdateOne {
-	if s != nil {
-		tuo.SetStatus(*s)
-	}
-	return tuo
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (tuo *TransactionUpdateOne) SetUpdatedAt(t time.Time) *TransactionUpdateOne {
-	tuo.mutation.SetUpdatedAt(t)
-	return tuo
-}
-
-// SetCompletedAt sets the "completed_at" field.
-func (tuo *TransactionUpdateOne) SetCompletedAt(t time.Time) *TransactionUpdateOne {
-	tuo.mutation.SetCompletedAt(t)
-	return tuo
-}
-
-// SetNillableCompletedAt sets the "completed_at" field if the given value is not nil.
-func (tuo *TransactionUpdateOne) SetNillableCompletedAt(t *time.Time) *TransactionUpdateOne {
-	if t != nil {
-		tuo.SetCompletedAt(*t)
-	}
-	return tuo
-}
-
-// ClearCompletedAt clears the value of the "completed_at" field.
-func (tuo *TransactionUpdateOne) ClearCompletedAt() *TransactionUpdateOne {
-	tuo.mutation.ClearCompletedAt()
-	return tuo
-}
-
 // SetUser sets the "user" edge to the User entity.
 func (tuo *TransactionUpdateOne) SetUser(u *User) *TransactionUpdateOne {
 	return tuo.SetUserID(u.ID)
@@ -462,7 +314,6 @@ func (tuo *TransactionUpdateOne) Select(field string, fields ...string) *Transac
 
 // Save executes the query and returns the updated Transaction entity.
 func (tuo *TransactionUpdateOne) Save(ctx context.Context) (*Transaction, error) {
-	tuo.defaults()
 	return withHooks(ctx, tuo.sqlSave, tuo.mutation, tuo.hooks)
 }
 
@@ -485,14 +336,6 @@ func (tuo *TransactionUpdateOne) Exec(ctx context.Context) error {
 func (tuo *TransactionUpdateOne) ExecX(ctx context.Context) {
 	if err := tuo.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (tuo *TransactionUpdateOne) defaults() {
-	if _, ok := tuo.mutation.UpdatedAt(); !ok {
-		v := transaction.UpdateDefaultUpdatedAt()
-		tuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -549,24 +392,6 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 	}
 	if value, ok := tuo.mutation.GetType(); ok {
 		_spec.SetField(transaction.FieldType, field.TypeEnum, value)
-	}
-	if value, ok := tuo.mutation.Description(); ok {
-		_spec.SetField(transaction.FieldDescription, field.TypeString, value)
-	}
-	if tuo.mutation.DescriptionCleared() {
-		_spec.ClearField(transaction.FieldDescription, field.TypeString)
-	}
-	if value, ok := tuo.mutation.Status(); ok {
-		_spec.SetField(transaction.FieldStatus, field.TypeString, value)
-	}
-	if value, ok := tuo.mutation.UpdatedAt(); ok {
-		_spec.SetField(transaction.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := tuo.mutation.CompletedAt(); ok {
-		_spec.SetField(transaction.FieldCompletedAt, field.TypeTime, value)
-	}
-	if tuo.mutation.CompletedAtCleared() {
-		_spec.ClearField(transaction.FieldCompletedAt, field.TypeTime)
 	}
 	if tuo.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{

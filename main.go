@@ -8,6 +8,7 @@ import (
 	"db/ent"
 	"db/service"
 
+	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 )
 
@@ -44,28 +45,17 @@ func main() {
 	fmt.Printf("Created user with ID: %d\n", user.ID)
 
 	// Create balances for the user
-	if err := balanceService.UpsertBalance(ctx, user.ID, "USD", 1000.00); err != nil {
-		log.Fatalf("failed creating balances: %v", err)
-	}
-	if err := balanceService.UpsertBalance(ctx, user.ID, "EUR", 500.00); err != nil {
-		log.Fatalf("failed creating balances: %v", err)
-	}
-	if err := balanceService.UpsertBalance(ctx, user.ID, "RUB", 50000.00); err != nil {
-		log.Fatalf("failed creating balances: %v", err)
-	}
-
-	// Create transactions for the user
-	transactions, err := transactionService.CreateSampleTransactions(ctx, user)
+	_, err = transactionService.Create(ctx, uuid.New().String(), user.ID, "USD", 1000.00, "deposit")
 	if err != nil {
-		log.Fatalf("failed creating transactions: %v", err)
+		log.Fatalf("failed creating balances: %v", err)
 	}
-	for i, tx := range transactions {
-		fmt.Printf("Transaction %d has ID: %s\n", i+1, tx.ID)
+	_, err = transactionService.Create(ctx, uuid.New().String(), user.ID, "EUR", 500.00, "deposit")
+	if err != nil {
+		log.Fatalf("failed creating balances: %v", err)
 	}
-
-	// Query users and transactions by ID
-	if err := QueryByID(ctx, userService, transactionService, user.ID, transactions[0].ID); err != nil {
-		log.Fatalf("failed querying by ID: %v", err)
+	_, err = transactionService.Create(ctx, uuid.New().String(), user.ID, "RUB", 50000.00, "deposit")
+	if err != nil {
+		log.Fatalf("failed creating balances: %v", err)
 	}
 
 	// Query transactions
@@ -90,7 +80,7 @@ func main() {
 	}
 
 	// Demonstrate balance update with a transaction
-	if err := UpdateBalanceWithTransaction(ctx, client, balanceService, user.ID); err != nil {
+	if err := UpdateBalanceWithTransaction(ctx, client, balanceService, transactionService, user.ID); err != nil {
 		log.Fatalf("failed updating balance: %v", err)
 	}
 
@@ -100,7 +90,7 @@ func main() {
 	}
 
 	// Demonstrate balance increment and decrement
-	if err := balanceService.DemonstrateBalanceOperations(ctx, user.ID); err != nil {
+	if err := transactionService.DemonstrateBalanceOperations(ctx, user.ID); err != nil {
 		log.Fatalf("failed demonstrating balance operations: %v", err)
 	}
 
@@ -121,8 +111,8 @@ func QueryByID(ctx context.Context, userService *service.UserService, txService 
 	if err != nil {
 		return fmt.Errorf("failed querying transaction by ID: %w", err)
 	}
-	fmt.Printf("Found transaction by ID %s: amount: %.2f %s, status: %s\n",
-		tx.ID, tx.Amount, tx.Currency, tx.Status)
+	fmt.Printf("Found transaction by ID %s: amount: %.2f %s\n",
+		tx.ID, tx.Amount, tx.Currency)
 
 	// Get all transactions for a user by user ID
 	userWithTx, err := userService.GetUserWithTransactions(ctx, userID)
@@ -143,7 +133,7 @@ func QueryByID(ctx context.Context, userService *service.UserService, txService 
 }
 
 // UpdateBalanceWithTransaction demonstrates updating a balance when a transaction occurs
-func UpdateBalanceWithTransaction(ctx context.Context, client *ent.Client, balanceService *service.BalanceService, userID int) error {
+func UpdateBalanceWithTransaction(ctx context.Context, client *ent.Client, balanceService *service.BalanceService, transactionService *service.TransactionService, userID int) error {
 	fmt.Println("\n--- Updating Balance with Transaction ---")
 
 	// Get the user's USD balance
@@ -156,7 +146,8 @@ func UpdateBalanceWithTransaction(ctx context.Context, client *ent.Client, balan
 
 	// Deposit amount - use IncrementBalance from the service
 	depositAmount := 250.0
-	if err := balanceService.UpsertBalance(ctx, userID, "USD", depositAmount); err != nil {
+	_, err = transactionService.Create(ctx, uuid.New().String(), userID, "USD", depositAmount, "deposit")
+	if err != nil {
 		return fmt.Errorf("failed incrementing balance: %w", err)
 	}
 
@@ -196,12 +187,12 @@ func QueryByUserID(ctx context.Context, client *ent.Client, balanceService *serv
 	}
 	fmt.Printf("Found USD balance with amount %.2f using user_id field directly\n", usdBalance.Amount)
 
-	// Get all completed transactions for user using user_id and status directly
-	completedTxs, err := txService.GetTransactionsByStatus(ctx, "completed")
+	// Get all transactions for user using user_id field directly
+	transactions, err = txService.GetAllTransactionsByUserID(ctx, userID)
 	if err != nil {
-		return fmt.Errorf("failed querying completed transactions: %w", err)
+		return fmt.Errorf("failed querying transactions: %w", err)
 	}
-	fmt.Printf("Found %d completed transactions\n", len(completedTxs))
+	fmt.Printf("Found %d transactions\n", len(transactions))
 
 	return nil
 }

@@ -40,20 +40,10 @@ func init() {
 	transactionDescCurrency := transactionFields[3].Descriptor()
 	// transaction.DefaultCurrency holds the default value on creation for the currency field.
 	transaction.DefaultCurrency = transactionDescCurrency.Default.(string)
-	// transactionDescStatus is the schema descriptor for status field.
-	transactionDescStatus := transactionFields[6].Descriptor()
-	// transaction.DefaultStatus holds the default value on creation for the status field.
-	transaction.DefaultStatus = transactionDescStatus.Default.(string)
 	// transactionDescCreatedAt is the schema descriptor for created_at field.
-	transactionDescCreatedAt := transactionFields[7].Descriptor()
+	transactionDescCreatedAt := transactionFields[5].Descriptor()
 	// transaction.DefaultCreatedAt holds the default value on creation for the created_at field.
 	transaction.DefaultCreatedAt = transactionDescCreatedAt.Default.(func() time.Time)
-	// transactionDescUpdatedAt is the schema descriptor for updated_at field.
-	transactionDescUpdatedAt := transactionFields[8].Descriptor()
-	// transaction.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	transaction.DefaultUpdatedAt = transactionDescUpdatedAt.Default.(func() time.Time)
-	// transaction.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	transaction.UpdateDefaultUpdatedAt = transactionDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// transactionDescID is the schema descriptor for id field.
 	transactionDescID := transactionFields[0].Descriptor()
 	// transaction.IDValidator is a validator for the "id" field. It is called by the builders before save.

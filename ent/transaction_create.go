@@ -53,34 +53,6 @@ func (tc *TransactionCreate) SetType(t transaction.Type) *TransactionCreate {
 	return tc
 }
 
-// SetDescription sets the "description" field.
-func (tc *TransactionCreate) SetDescription(s string) *TransactionCreate {
-	tc.mutation.SetDescription(s)
-	return tc
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (tc *TransactionCreate) SetNillableDescription(s *string) *TransactionCreate {
-	if s != nil {
-		tc.SetDescription(*s)
-	}
-	return tc
-}
-
-// SetStatus sets the "status" field.
-func (tc *TransactionCreate) SetStatus(s string) *TransactionCreate {
-	tc.mutation.SetStatus(s)
-	return tc
-}
-
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (tc *TransactionCreate) SetNillableStatus(s *string) *TransactionCreate {
-	if s != nil {
-		tc.SetStatus(*s)
-	}
-	return tc
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (tc *TransactionCreate) SetCreatedAt(t time.Time) *TransactionCreate {
 	tc.mutation.SetCreatedAt(t)
@@ -91,34 +63,6 @@ func (tc *TransactionCreate) SetCreatedAt(t time.Time) *TransactionCreate {
 func (tc *TransactionCreate) SetNillableCreatedAt(t *time.Time) *TransactionCreate {
 	if t != nil {
 		tc.SetCreatedAt(*t)
-	}
-	return tc
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (tc *TransactionCreate) SetUpdatedAt(t time.Time) *TransactionCreate {
-	tc.mutation.SetUpdatedAt(t)
-	return tc
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (tc *TransactionCreate) SetNillableUpdatedAt(t *time.Time) *TransactionCreate {
-	if t != nil {
-		tc.SetUpdatedAt(*t)
-	}
-	return tc
-}
-
-// SetCompletedAt sets the "completed_at" field.
-func (tc *TransactionCreate) SetCompletedAt(t time.Time) *TransactionCreate {
-	tc.mutation.SetCompletedAt(t)
-	return tc
-}
-
-// SetNillableCompletedAt sets the "completed_at" field if the given value is not nil.
-func (tc *TransactionCreate) SetNillableCompletedAt(t *time.Time) *TransactionCreate {
-	if t != nil {
-		tc.SetCompletedAt(*t)
 	}
 	return tc
 }
@@ -173,17 +117,9 @@ func (tc *TransactionCreate) defaults() {
 		v := transaction.DefaultCurrency
 		tc.mutation.SetCurrency(v)
 	}
-	if _, ok := tc.mutation.Status(); !ok {
-		v := transaction.DefaultStatus
-		tc.mutation.SetStatus(v)
-	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		v := transaction.DefaultCreatedAt()
 		tc.mutation.SetCreatedAt(v)
-	}
-	if _, ok := tc.mutation.UpdatedAt(); !ok {
-		v := transaction.DefaultUpdatedAt()
-		tc.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -206,14 +142,8 @@ func (tc *TransactionCreate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Transaction.type": %w`, err)}
 		}
 	}
-	if _, ok := tc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Transaction.status"`)}
-	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Transaction.created_at"`)}
-	}
-	if _, ok := tc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Transaction.updated_at"`)}
 	}
 	if v, ok := tc.mutation.ID(); ok {
 		if err := transaction.IDValidator(v); err != nil {
@@ -270,25 +200,9 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 		_spec.SetField(transaction.FieldType, field.TypeEnum, value)
 		_node.Type = value
 	}
-	if value, ok := tc.mutation.Description(); ok {
-		_spec.SetField(transaction.FieldDescription, field.TypeString, value)
-		_node.Description = value
-	}
-	if value, ok := tc.mutation.Status(); ok {
-		_spec.SetField(transaction.FieldStatus, field.TypeString, value)
-		_node.Status = value
-	}
 	if value, ok := tc.mutation.CreatedAt(); ok {
 		_spec.SetField(transaction.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
-	}
-	if value, ok := tc.mutation.UpdatedAt(); ok {
-		_spec.SetField(transaction.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
-	}
-	if value, ok := tc.mutation.CompletedAt(); ok {
-		_spec.SetField(transaction.FieldCompletedAt, field.TypeTime, value)
-		_node.CompletedAt = &value
 	}
 	if nodes := tc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

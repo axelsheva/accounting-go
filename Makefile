@@ -3,10 +3,11 @@
 # Запуск PostgreSQL в Docker
 up:
 	docker-compose up -d
+	sleep 1
 
 # Остановка контейнеров
 down:
-	docker-compose down
+	docker-compose down --volumes
 
 # Запуск приложения
 run:

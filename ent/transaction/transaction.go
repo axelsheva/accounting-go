@@ -23,16 +23,8 @@ const (
 	FieldCurrency = "currency"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
-	// FieldDescription holds the string denoting the description field in the database.
-	FieldDescription = "description"
-	// FieldStatus holds the string denoting the status field in the database.
-	FieldStatus = "status"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
-	FieldUpdatedAt = "updated_at"
-	// FieldCompletedAt holds the string denoting the completed_at field in the database.
-	FieldCompletedAt = "completed_at"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// Table holds the table name of the transaction in the database.
@@ -53,11 +45,7 @@ var Columns = []string{
 	FieldAmount,
 	FieldCurrency,
 	FieldType,
-	FieldDescription,
-	FieldStatus,
 	FieldCreatedAt,
-	FieldUpdatedAt,
-	FieldCompletedAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -73,14 +61,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultCurrency holds the default value on creation for the "currency" field.
 	DefaultCurrency string
-	// DefaultStatus holds the default value on creation for the "status" field.
-	DefaultStatus string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
-	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
-	UpdateDefaultUpdatedAt func() time.Time
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
@@ -92,7 +74,6 @@ type Type string
 const (
 	TypeDeposit    Type = "deposit"
 	TypeWithdrawal Type = "withdrawal"
-	TypeTransfer   Type = "transfer"
 )
 
 func (_type Type) String() string {
@@ -102,7 +83,7 @@ func (_type Type) String() string {
 // TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
 func TypeValidator(_type Type) error {
 	switch _type {
-	case TypeDeposit, TypeWithdrawal, TypeTransfer:
+	case TypeDeposit, TypeWithdrawal:
 		return nil
 	default:
 		return fmt.Errorf("transaction: invalid enum value for type field: %q", _type)
@@ -137,29 +118,9 @@ func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
 }
 
-// ByDescription orders the results by the description field.
-func ByDescription(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDescription, opts...).ToFunc()
-}
-
-// ByStatus orders the results by the status field.
-func ByStatus(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldStatus, opts...).ToFunc()
-}
-
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
-}
-
-// ByUpdatedAt orders the results by the updated_at field.
-func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
-}
-
-// ByCompletedAt orders the results by the completed_at field.
-func ByCompletedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCompletedAt, opts...).ToFunc()
 }
 
 // ByUserField orders the results by user field.

@@ -5,32 +5,37 @@ import (
 	"db/ent"
 	"db/ent/transaction"
 	"db/repository"
+	"errors"
 	"fmt"
-	"time"
+
+	"github.com/google/uuid"
 )
 
-// TransactionService представляет сервис для работы с транзакциями
+// TransactionService presents a service for working with transactions
 type TransactionService struct {
-	txRepo *repository.TransactionRepository
+	txRepo      *repository.TransactionRepository
+	balanceRepo *repository.BalanceRepository
 }
 
-// NewTransactionService создает новый сервис транзакций
+// NewTransactionService creates a new transaction service
 func NewTransactionService(client *ent.Client) *TransactionService {
+	balanceRepo := repository.NewBalanceRepository(client)
+
 	return &TransactionService{
-		txRepo: repository.NewTransactionRepository(client),
+		balanceRepo: balanceRepo,
+		txRepo:      repository.NewTransactionRepository(client, balanceRepo),
 	}
 }
 
-// CreateSampleTransactions создает набор тестовых транзакций для пользователя
-func (s *TransactionService) CreateSampleTransactions(ctx context.Context, user *ent.User) ([]*ent.Transaction, error) {
-	transactions, err := s.txRepo.CreateSampleTransactions(ctx, user)
+func (s *TransactionService) Create(ctx context.Context, id string, userID int, currency string, amount float64, txType transaction.Type) (*ent.Transaction, error) {
+	tx, err := s.txRepo.Create(ctx, id, userID, amount, currency, txType)
 	if err != nil {
-		return nil, fmt.Errorf("transaction service - create sample transactions: %w", err)
+		return nil, fmt.Errorf("transaction service - create transaction: %w", err)
 	}
-	return transactions, nil
+	return tx, nil
 }
 
-// GetTransactionByID получает транзакцию по её ID
+// GetTransactionByID gets a transaction by its ID
 func (s *TransactionService) GetTransactionByID(ctx context.Context, id string) (*ent.Transaction, error) {
 	tx, err := s.txRepo.GetByID(ctx, id)
 	if err != nil {
@@ -39,7 +44,7 @@ func (s *TransactionService) GetTransactionByID(ctx context.Context, id string) 
 	return tx, nil
 }
 
-// GetAllTransactionsByUserID получает все транзакции пользователя
+// GetAllTransactionsByUserID gets all transactions of a user
 func (s *TransactionService) GetAllTransactionsByUserID(ctx context.Context, userID int) ([]*ent.Transaction, error) {
 	txs, err := s.txRepo.GetAllByUserID(ctx, userID)
 	if err != nil {
@@ -48,34 +53,24 @@ func (s *TransactionService) GetAllTransactionsByUserID(ctx context.Context, use
 	return txs, nil
 }
 
-// GetTransactionsByStatus получает все транзакции с указанным статусом
-func (s *TransactionService) GetTransactionsByStatus(ctx context.Context, status string) ([]*ent.Transaction, error) {
-	txs, err := s.txRepo.GetAllByStatus(ctx, status)
-	if err != nil {
-		return nil, fmt.Errorf("transaction service - get transactions by status: %w", err)
-	}
-	return txs, nil
-}
-
-// TestIdempotency демонстрирует, как ID транзакции предотвращает дублирование транзакций
+// TestIdempotency demonstrates how the transaction ID prevents duplicate transactions
 func (s *TransactionService) TestIdempotency(ctx context.Context, user *ent.User) error {
-	// Создаем фиксированный ID для демонстрации
-	fixedID := s.txRepo.GenerateTransactionID()
+	// Create a fixed ID for demonstration
+	fixedID := uuid.New().String()
 
-	// Первая попытка создания транзакции - должна успешно пройти
+	// First attempt to create a transaction - should succeed
 	fmt.Println("\n--- Testing Idempotency ---")
 	fmt.Println("First attempt with fixed transaction ID:", fixedID)
 
-	now := time.Now()
-	tx1, err := s.txRepo.Create(ctx, fixedID, user.ID, 500.00, "USD", transaction.TypeDeposit, "Idempotency test", "completed", &now)
+	tx1, err := s.txRepo.Create(ctx, fixedID, user.ID, 500.00, "USD", transaction.TypeDeposit)
 	if err != nil {
 		return fmt.Errorf("failed first attempt: %w", err)
 	}
 	fmt.Printf("First transaction created successfully: %v\n", tx1)
 
-	// Вторая попытка с тем же ID - должна завершиться ошибкой нарушения ограничения
+	// Second attempt with the same ID - should fail due to the constraint
 	fmt.Println("\nSecond attempt with same transaction ID:", fixedID)
-	_, err = s.txRepo.Create(ctx, fixedID, user.ID, 500.00, "USD", transaction.TypeDeposit, "Idempotency test - duplicate", "completed", &now)
+	_, err = s.txRepo.Create(ctx, fixedID, user.ID, 500.00, "USD", transaction.TypeDeposit)
 
 	if err != nil {
 		fmt.Printf("Second attempt failed as expected: %v\n", err)
@@ -83,39 +78,80 @@ func (s *TransactionService) TestIdempotency(ctx context.Context, user *ent.User
 		return nil
 	}
 
-	// Если мы попали сюда, что-то пошло не так - вторая попытка должна была завершиться неудачей
+	// If we got here, something went wrong - the second attempt should have failed
 	return fmt.Errorf("idempotency test failed: duplicate transaction with same ID was allowed")
 }
 
-// QueryTransactions демонстрирует, как запрашивать транзакции из базы данных
+// QueryTransactions demonstrates how to query transactions from the database
 func (s *TransactionService) QueryTransactions(ctx context.Context, userID int) error {
-	// Находим все транзакции
+	// Find all transactions
 	transactions, err := s.txRepo.GetAllByUserID(ctx, userID)
 	if err != nil {
 		return fmt.Errorf("failed querying transactions: %w", err)
 	}
 	fmt.Printf("Found %d transactions\n", len(transactions))
 
-	// Находим завершенные транзакции
-	completed, err := s.GetTransactionsByStatus(ctx, "completed")
-	if err != nil {
-		return fmt.Errorf("failed querying completed transactions: %w", err)
-	}
-	fmt.Printf("Found %d completed transactions\n", len(completed))
-
-	// Находим ожидающие транзакции
-	pending, err := s.GetTransactionsByStatus(ctx, "pending")
-	if err != nil {
-		return fmt.Errorf("failed querying pending transactions: %w", err)
-	}
-	fmt.Printf("Found %d pending transactions\n", len(pending))
-
-	// Получаем транзакции для конкретного пользователя через репозиторий
+	// Get transactions for a specific user through the repository
 	userTxs, err := s.txRepo.GetAllByUserIDUsingEdge(ctx, userID)
 	if err != nil {
 		return fmt.Errorf("failed querying user with transactions: %w", err)
 	}
 	fmt.Printf("User '%d' has %d transactions\n", userID, len(userTxs))
+
+	return nil
+}
+
+// DemonstrateBalanceOperations demonstrates balance operations
+func (s *TransactionService) DemonstrateBalanceOperations(ctx context.Context, userID int) error {
+	fmt.Println("\n--- Demonstrating Balance Operations ---")
+
+	// Get initial EUR balance
+	eurBalance, err := s.balanceRepo.GetByUserIDAndCurrency(ctx, userID, "EUR")
+	if err != nil {
+		return fmt.Errorf("failed querying EUR balance: %w", err)
+	}
+
+	initialAmount := eurBalance.Amount
+	fmt.Printf("Initial EUR balance: %.2f\n", initialAmount)
+
+	// Increment the balance by 100 EUR
+	incrementAmount := 100.0
+	_, err = s.txRepo.Create(ctx, uuid.New().String(), userID, incrementAmount, "EUR", transaction.TypeDeposit)
+	if err != nil {
+		return fmt.Errorf("failed incrementing balance: %w", err)
+	}
+
+	// Get updated balance
+	eurBalance, err = s.balanceRepo.GetByUserIDAndCurrency(ctx, userID, "EUR")
+	if err != nil {
+		return fmt.Errorf("failed querying updated EUR balance: %w", err)
+	}
+
+	fmt.Printf("EUR balance after increment of %.2f: %.2f\n", incrementAmount, eurBalance.Amount)
+
+	// Decrement the balance
+	decrementAmount := 50.0
+	_, err = s.txRepo.Create(ctx, uuid.New().String(), userID, decrementAmount, "EUR", transaction.TypeWithdrawal)
+	if err != nil {
+		return fmt.Errorf("failed decrementing balance: %w", err)
+	}
+
+	// Get final balance
+	eurBalance, err = s.balanceRepo.GetByUserIDAndCurrency(ctx, userID, "EUR")
+	if err != nil {
+		return fmt.Errorf("failed querying final EUR balance: %w", err)
+	}
+
+	fmt.Printf("EUR balance after decrement of %.2f: %.2f\n", decrementAmount, eurBalance.Amount)
+
+	// Try to decrement too much (should fail)
+	tooMuchAmount := eurBalance.Amount + 1000.0
+	_, err = s.txRepo.Create(ctx, uuid.New().String(), userID, tooMuchAmount, "EUR", transaction.TypeWithdrawal)
+	if err != nil {
+		fmt.Printf("As expected, decrementing too much (%.2f) failed: %v\n", tooMuchAmount, err)
+	} else {
+		return errors.New("large withdrawal should have failed but didn't")
+	}
 
 	return nil
 }

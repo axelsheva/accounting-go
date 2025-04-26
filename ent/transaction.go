@@ -17,26 +17,18 @@ import (
 type Transaction struct {
 	config `json:"-"`
 	// ID of the ent.
-	// ID транзакции (строковый первичный ключ)
+	// ID of the transaction (string primary key)
 	ID string `json:"id,omitempty"`
-	// ID пользователя, которому принадлежит транзакция
+	// ID of the user, to which the transaction belongs
 	UserID int `json:"user_id,omitempty"`
-	// Сумма транзакции
+	// Amount of the transaction
 	Amount float64 `json:"amount,omitempty"`
-	// Валюта транзакции
+	// Currency of the transaction
 	Currency string `json:"currency,omitempty"`
-	// Тип транзакции: пополнение, снятие, перевод
+	// Type of the transaction: deposit, withdrawal
 	Type transaction.Type `json:"type,omitempty"`
-	// Описание транзакции
-	Description string `json:"description,omitempty"`
-	// Статус транзакции: в обработке, выполнено, отклонено и т.д.
-	Status string `json:"status,omitempty"`
-	// Время создания транзакции
+	// Time of the transaction creation
 	CreatedAt time.Time `json:"created_at,omitempty"`
-	// Время последнего обновления транзакции
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// Время завершения транзакции
-	CompletedAt *time.Time `json:"completed_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TransactionQuery when eager-loading is set.
 	Edges        TransactionEdges `json:"edges"`
@@ -45,7 +37,7 @@ type Transaction struct {
 
 // TransactionEdges holds the relations/edges for other nodes in the graph.
 type TransactionEdges struct {
-	// Пользователь, которому принадлежит транзакция
+	// User, to which the transaction belongs
 	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
@@ -72,9 +64,9 @@ func (*Transaction) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case transaction.FieldUserID:
 			values[i] = new(sql.NullInt64)
-		case transaction.FieldID, transaction.FieldCurrency, transaction.FieldType, transaction.FieldDescription, transaction.FieldStatus:
+		case transaction.FieldID, transaction.FieldCurrency, transaction.FieldType:
 			values[i] = new(sql.NullString)
-		case transaction.FieldCreatedAt, transaction.FieldUpdatedAt, transaction.FieldCompletedAt:
+		case transaction.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -121,36 +113,11 @@ func (t *Transaction) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				t.Type = transaction.Type(value.String)
 			}
-		case transaction.FieldDescription:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field description", values[i])
-			} else if value.Valid {
-				t.Description = value.String
-			}
-		case transaction.FieldStatus:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
-			} else if value.Valid {
-				t.Status = value.String
-			}
 		case transaction.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				t.CreatedAt = value.Time
-			}
-		case transaction.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				t.UpdatedAt = value.Time
-			}
-		case transaction.FieldCompletedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field completed_at", values[i])
-			} else if value.Valid {
-				t.CompletedAt = new(time.Time)
-				*t.CompletedAt = value.Time
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])
@@ -205,22 +172,8 @@ func (t *Transaction) String() string {
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", t.Type))
 	builder.WriteString(", ")
-	builder.WriteString("description=")
-	builder.WriteString(t.Description)
-	builder.WriteString(", ")
-	builder.WriteString("status=")
-	builder.WriteString(t.Status)
-	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(t.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(t.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	if v := t.CompletedAt; v != nil {
-		builder.WriteString("completed_at=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
 	builder.WriteByte(')')
 	return builder.String()
 }
