@@ -107,6 +107,7 @@ postgresql://postgres:password@localhost:5432/postgres?sslmode=disable
 4. Validate input data before database operations
 5. Use the idempotency pattern for transaction processing
 6. Do not change existing code without prior confirmation and reasoning.
+7. Write code and comments only in English.
 
 
 
