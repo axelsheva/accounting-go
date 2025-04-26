@@ -8,21 +8,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// SetupRouter настраивает маршрутизацию Gin и возвращает экземпляр роутера
+// SetupRouter sets up the Gin router and returns an instance of the router
 func SetupRouter(client *ent.Client) *gin.Engine {
 	r := gin.Default()
 
-	// Инициализация сервисов и обработчиков
+	// Initialize services and handlers
 	userService := service.NewUserService(client)
 	userHandler := handler.NewUserHandler(userService)
 
-	// Группа API endpoints
+	transactionService := service.NewTransactionService(client)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
+
+	// API endpoints group
 	api := r.Group("/api")
 	{
-		// Маршруты для пользователей
+		// Users endpoints
 		users := api.Group("/users")
 		{
 			users.POST("", userHandler.CreateUser)
+		}
+
+		// Transactions endpoints
+		transactions := api.Group("/transactions")
+		{
+			transactions.POST("", transactionHandler.CreateTransaction)
 		}
 	}
 
