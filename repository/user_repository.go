@@ -11,19 +11,19 @@ import (
 	"github.com/google/uuid"
 )
 
-// UserRepository представляет репозиторий для работы с пользователями
+// UserRepository represents a repository for working with users
 type UserRepository struct {
 	client *ent.Client
 }
 
-// NewUserRepository создаёт новый репозиторий пользователей
+// NewUserRepository creates a new user repository
 func NewUserRepository(client *ent.Client) *UserRepository {
 	return &UserRepository{
 		client: client,
 	}
 }
 
-// Create создаёт нового пользователя с использованием SQL транзакции
+// Create creates a new user using an SQL transaction
 func (r *UserRepository) Create(ctx context.Context, name string, email string, age int) (*ent.User, error) {
 	// Start a transaction
 	tx, err := r.client.Tx(ctx)
@@ -49,7 +49,7 @@ func (r *UserRepository) Create(ctx context.Context, name string, email string, 
 	return user, nil
 }
 
-// CreateWithTx создаёт нового пользователя внутри существующей SQL транзакции
+// CreateWithTx creates a new user within an existing SQL transaction
 func (r *UserRepository) CreateWithTx(ctx context.Context, tx *ent.Tx, name string, email string, age int) (*ent.User, error) {
 	u, err := tx.User.
 		Create().

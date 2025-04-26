@@ -17,7 +17,7 @@ type User struct {
 func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").
-			Comment("ID пользователя с автоинкрементом").
+			Comment("User ID with auto-increment").
 			StructTag(`json:"id,omitempty"`),
 		field.String("name").
 			NotEmpty(),
@@ -35,8 +35,8 @@ func (User) Fields() []ent.Field {
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("transactions", Transaction.Type).
-			Comment("Транзакции пользователя"),
+			Comment("User's transactions"),
 		edge.To("balances", Balance.Type).
-			Comment("Балансы пользователя в разных валютах"),
+			Comment("User's balances in different currencies"),
 	}
 }

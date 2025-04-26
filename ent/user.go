@@ -16,7 +16,7 @@ import (
 type User struct {
 	config `json:"-"`
 	// ID of the ent.
-	// ID пользователя с автоинкрементом
+	// User ID with auto-increment
 	ID int `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
@@ -34,9 +34,9 @@ type User struct {
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// Транзакции пользователя
+	// User's transactions
 	Transactions []*Transaction `json:"transactions,omitempty"`
-	// Балансы пользователя в разных валютах
+	// User's balances in different currencies
 	Balances []*Balance `json:"balances,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.

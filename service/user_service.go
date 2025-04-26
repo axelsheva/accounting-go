@@ -7,19 +7,19 @@ import (
 	"fmt"
 )
 
-// UserService представляет сервис для работы с пользователями
+// UserService represents a service for working with users
 type UserService struct {
 	userRepo *repository.UserRepository
 }
 
-// NewUserService создает новый сервис пользователей
+// NewUserService creates a new user service
 func NewUserService(client *ent.Client) *UserService {
 	return &UserService{
 		userRepo: repository.NewUserRepository(client),
 	}
 }
 
-// CreateUser создает нового пользователя
+// CreateUser creates a new user
 func (s *UserService) CreateUser(ctx context.Context, name, email string, age int) (*ent.User, error) {
 	user, err := s.userRepo.Create(ctx, name, email, age)
 	if err != nil {
@@ -28,7 +28,7 @@ func (s *UserService) CreateUser(ctx context.Context, name, email string, age in
 	return user, nil
 }
 
-// CreateRandomUser создаёт пользователя со случайными данными (для тестирования)
+// CreateRandomUser creates a user with random data (for testing)
 func (s *UserService) CreateRandomUser(ctx context.Context) (*ent.User, error) {
 	user, err := s.userRepo.CreateRandom(ctx)
 	if err != nil {
@@ -37,7 +37,7 @@ func (s *UserService) CreateRandomUser(ctx context.Context) (*ent.User, error) {
 	return user, nil
 }
 
-// GetUserByID получает пользователя по его ID
+// GetUserByID gets a user by their ID
 func (s *UserService) GetUserByID(ctx context.Context, id int) (*ent.User, error) {
 	user, err := s.userRepo.GetByID(ctx, id)
 	if err != nil {
@@ -46,7 +46,7 @@ func (s *UserService) GetUserByID(ctx context.Context, id int) (*ent.User, error
 	return user, nil
 }
 
-// GetUserWithTransactions получает пользователя вместе с его транзакциями
+// GetUserWithTransactions gets a user together with their transactions
 func (s *UserService) GetUserWithTransactions(ctx context.Context, id int) (*ent.User, error) {
 	user, err := s.userRepo.GetWithTransactions(ctx, id)
 	if err != nil {

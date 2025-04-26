@@ -1,29 +1,29 @@
 .PHONY: up down run generate new-entity tidy
 
-# Запуск PostgreSQL в Docker
+# Start PostgreSQL in Docker
 up:
 	docker-compose up -d
 	sleep 1
 
-# Остановка контейнеров
+# Stop containers
 down:
 	docker-compose down --volumes
 
-# Запуск приложения
+# Run application
 run:
 	go run main.go
 
-# Генерация кода Ent
+# Generate Ent code
 generate:
 	go generate ./ent
 
-# Создание новой сущности (использование: make new-entity NAME=ИмяСущности)
+# Create new entity (usage: make new-entity NAME=EntityName)
 new-entity:
 	go run -mod=mod entgo.io/ent/cmd/ent new $(NAME)
 
-# Обновление зависимостей
+# Update dependencies
 tidy:
 	go mod tidy
 
-# Запуск PostgreSQL и приложения
+# Start PostgreSQL and application
 start: down up run

@@ -11,12 +11,12 @@ import (
 	"db/errors"
 )
 
-// BalanceRepository представляет репозиторий для работы с балансами
+// BalanceRepository represents a repository for working with balances
 type BalanceRepository struct {
 	client *ent.Client
 }
 
-// NewBalanceRepository создаёт новый репозиторий балансов
+// NewBalanceRepository creates a new balance repository
 func NewBalanceRepository(client *ent.Client) *BalanceRepository {
 	return &BalanceRepository{
 		client: client,
