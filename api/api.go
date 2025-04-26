@@ -10,7 +10,8 @@ import (
 
 // SetupRouter sets up the Gin router and returns an instance of the router
 func SetupRouter(client *ent.Client) *gin.Engine {
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.Recovery())
 
 	// Initialize services and handlers
 	userService := service.NewUserService(client)

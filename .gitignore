@@ -1,3 +1,7 @@
+# Executables
 api-server
 api-loadtest
+loadtest
+
+# Environment variables
 .env

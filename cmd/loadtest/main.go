@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net"
 	"net/http"
 	"slices"
 	"strings"
@@ -135,9 +136,7 @@ func (m *Metrics) AverageResponseTime() time.Duration {
 }
 
 // Function for creating a user
-func createUser(metrics *Metrics) (*CreateUserResponse, error) {
-	client := &http.Client{}
-
+func createUser(client *http.Client, metrics *Metrics) (*CreateUserResponse, error) {
 	name := fmt.Sprintf("User-%s", uuid.New().String()[:8])
 	email := fmt.Sprintf("%s@example.com", strings.ToLower(name))
 
@@ -187,9 +186,7 @@ func createUser(metrics *Metrics) (*CreateUserResponse, error) {
 }
 
 // Function for creating a transaction
-func createTransaction(userID int, metrics *Metrics) (*CreateTransactionResponse, error) {
-	client := &http.Client{}
-
+func createTransaction(client *http.Client, userID int, metrics *Metrics) (*CreateTransactionResponse, error) {
 	// Generate random transaction data
 	amount := rand.Float64() * 1000
 	currencies := []string{"USD", "EUR", "GBP", "JPY"}
@@ -244,13 +241,13 @@ func createTransaction(userID int, metrics *Metrics) (*CreateTransactionResponse
 }
 
 // Worker function for processing users
-func worker(id int, userIDs <-chan int, wg *sync.WaitGroup, metrics *Metrics) {
+func worker(id int, userIDs <-chan int, wg *sync.WaitGroup, client *http.Client, metrics *Metrics) {
 	defer wg.Done()
 
 	for userID := range userIDs {
 		// Create transactions for each user
 		for i := 0; i < *numTransactions; i++ {
-			tx, err := createTransaction(userID, metrics)
+			tx, err := createTransaction(client, userID, metrics)
 			if err != nil {
 				log.Printf("Worker %d: error creating transaction for user %d: %v", id, userID, err)
 				continue
@@ -268,6 +265,27 @@ func main() {
 	log.Printf("Starting load test with %d users, %d transactions per user, %d parallel goroutines",
 		*numUsers, *numTransactions, *concurrency)
 
+	// Create a properly configured HTTP client with connection pooling
+	transport := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+		MaxIdleConnsPerHost:   100, // This is important - default is 2
+		MaxConnsPerHost:       0,   // 0 means no limit
+	}
+
+	client := &http.Client{
+		Transport: transport,
+		Timeout:   time.Second * 30,
+	}
+
 	// Initialize metrics
 	userMetrics := &Metrics{
 		MinResponseTime: time.Hour, // Initialize with a large value
@@ -280,7 +298,7 @@ func main() {
 	users := make([]*CreateUserResponse, 0, *numUsers)
 	log.Printf("Creating %d users...", *numUsers)
 	for range make([]struct{}, *numUsers) {
-		user, err := createUser(userMetrics)
+		user, err := createUser(client, userMetrics)
 		if err != nil {
 			log.Printf("Error creating user: %v", err)
 			continue
@@ -310,7 +328,7 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(*concurrency)
 	for i := 0; i < *concurrency; i++ {
-		go worker(i+1, userIDs, &wg, txMetrics)
+		go worker(i+1, userIDs, &wg, client, txMetrics)
 	}
 	wg.Wait()
 

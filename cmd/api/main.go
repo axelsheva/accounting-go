@@ -50,6 +50,9 @@ func main() {
 	// Use jsoniter for faster JSON processing through middleware
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
+	// Set Gin to release mode to disable debug logs
+	gin.SetMode(gin.ReleaseMode)
+
 	// Setup Gin router
 	router := api.SetupRouter(client)
 
