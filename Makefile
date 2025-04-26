@@ -26,4 +26,4 @@ tidy:
 	go mod tidy
 
 # Start PostgreSQL and application
-start: down up run
+start: up run
