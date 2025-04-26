@@ -1,0 +1,112 @@
+---
+description: This project is a Go application that demonstrates working with databases using the Ent ORM framework and PostgreSQL. It implements a simple financial system with users, balances, and transactions.
+globs: 
+alwaysApply: true
+---
+# Go Database Project Guide
+
+This project is a Go application that demonstrates working with databases using the Ent ORM framework and PostgreSQL. It implements a simple financial system with users, balances, and transactions.
+
+## Technologies and Frameworks
+
+- **Go**: Version 1.24.2
+- **Ent ORM**: Version 0.14.4 - An entity framework for Go
+- **PostgreSQL**: Version 16 (via Docker)
+- **Docker/Docker Compose**: For database container management
+
+## Project Structure
+
+- `ent/`: Generated Ent code
+  - `ent/schema/`: Entity schema definitions (User, Balance, Transaction)
+- `service/`: Business logic services
+  - `user_service.go`: User management operations
+  - `balance_service.go`: Balance management operations
+  - `transaction_service.go`: Transaction processing operations
+- `repository/`: Data access layer
+- `main.go`: Application entry point with demo code
+- `docker-compose.yml`: PostgreSQL container configuration
+
+## Core Entities
+
+1. **User**:
+   - Properties: id, name, email, age
+   - Relationships: has many transactions, has many balances
+
+2. **Balance**:
+   - Properties: id, user_id, amount, currency, reserved_amount, is_active
+   - Relationships: belongs to a user
+   - Constraints: amount must be non-negative
+   - Unique: user_id + currency combination must be unique
+
+3. **Transaction**:
+   - Properties: id (string UUID), user_id, amount, currency, type, status
+   - Transaction types: deposit, withdrawal, transfer
+   - Transaction statuses: pending, completed, failed, etc.
+   - Relationships: belongs to a user
+
+## Getting Started
+
+1. **Start the PostgreSQL database**:
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Run the application**:
+   ```bash
+   go run main.go
+   ```
+
+3. **Generate Ent code after schema changes**:
+   ```bash
+   go generate ./ent
+   ```
+
+4. **Add a new entity**:
+   ```bash
+   go run -mod=mod entgo.io/ent/cmd/ent new EntityName
+   ```
+
+## Key Services
+
+### UserService
+- `CreateRandomUser`: Creates a user with random data
+- `GetUserByID`: Retrieves a user by ID
+- `GetUserWithTransactions`: Gets a user with their transactions
+
+### BalanceService
+- `UpsertBalance`: Creates or updates a user's balance in a specific currency
+- `GetUserBalance`: Retrieves a user's balance in a specific currency
+- `GetUserBalances`: Gets all balances for a user
+- `IncrementBalance`: Increases a user's balance
+- `DecrementBalance`: Decreases a user's balance
+
+### TransactionService
+- `CreateTransaction`: Creates a new transaction
+- `GetTransactionByID`: Retrieves a transaction by ID
+- `GetAllTransactionsByUserID`: Gets all transactions for a user
+- `GetTransactionsByStatus`: Filters transactions by status
+
+## Database Connection
+
+The application connects to PostgreSQL using the following connection string:
+```
+postgresql://postgres:password@localhost:5432/postgres?sslmode=disable
+```
+
+## Design Patterns
+
+- **Repository Pattern**: Separates data access logic
+- **Service Layer**: Contains business logic
+- **Entity Framework**: Uses Ent for object-relational mapping
+
+## Best Practices for This Project
+
+1. Always use transactions for operations that affect multiple entities
+2. Check for existing balances before creating new ones
+3. Use proper error handling in service methods
+4. Validate input data before database operations
+5. Use the idempotency pattern for transaction processing
+6. Do not change existing code without prior confirmation and reasoning.
+
+
+

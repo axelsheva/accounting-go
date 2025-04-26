@@ -1,0 +1,17 @@
+{
+  "version": "0.2",
+  "ignorePaths": ["./go.mod", "./go.sum"],
+  "dictionaryDefinitions": [],
+  "dictionaries": [],
+  "language": "en,ru,uk",
+  "words": ["Nillable"],
+  "ignoreWords": [
+    "entgo",
+    "healthcheck",
+    "pg_isready",
+    "sslmode",
+    "upserting",
+    "entsql"
+  ],
+  "import": []
+}
