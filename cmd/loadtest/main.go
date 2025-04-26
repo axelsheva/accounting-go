@@ -8,7 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"sort"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -23,7 +23,7 @@ const (
 // Parameters from command line
 var (
 	numUsers        = flag.Int("users", 100, "Number of users to create")
-	numTransactions = flag.Int("transactions", 100, "Number of transactions per user")
+	numTransactions = flag.Int("transactions", 1000, "Number of transactions per user")
 	concurrency     = flag.Int("concurrency", 10, "Number of concurrent goroutines")
 	verbose         = flag.Bool("verbose", false, "Enable verbose output")
 	baseURL         = flag.String("url", apiBaseURL, "Base URL for the API")
@@ -109,9 +109,7 @@ func (m *Metrics) CalculatePercentiles() map[string]time.Duration {
 	// Sort response times
 	sorted := make([]time.Duration, len(m.ResponseTimes))
 	copy(sorted, m.ResponseTimes)
-	sort.Slice(sorted, func(i, j int) bool {
-		return sorted[i] < sorted[j]
-	})
+	slices.Sort(sorted)
 
 	n := len(sorted)
 	p50 := sorted[n*50/100]

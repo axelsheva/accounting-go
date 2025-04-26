@@ -1,54 +1,54 @@
 # Go Ent PostgreSQL Example
 
-Пример простого Go приложения, использующего фреймворк Ent ORM для работы с PostgreSQL.
+Example of a simple Go application using the Ent ORM framework with PostgreSQL.
 
-## Запуск
+## Running
 
-### Запуск PostgreSQL через Docker Compose
+### Starting PostgreSQL via Docker Compose
 
-Запустите PostgreSQL с помощью Docker Compose:
+Launch PostgreSQL using Docker Compose:
 
 ```bash
 docker-compose up -d
 ```
 
-Это запустит сервис PostgreSQL на порту 5432 с следующими настройками:
+This will start a PostgreSQL service on port 5432 with the following settings:
 
-- Пользователь: postgres
-- Пароль: password
-- БД: postgres
+- User: postgres
+- Password: password
+- Database: postgres
 
-### Запуск приложения
+### Running the application
 
-Запустите приложение с помощью следующей команды:
+Start the application with the following command:
 
 ```bash
 go run main.go
 ```
 
-Приложение выполнит следующие действия:
+The application will perform the following actions:
 
-1. Подключится к PostgreSQL
-2. Создаст схему базы данных на основе Ent-моделей
-3. Создаст пользователя
-4. Выполнит запрос для получения пользователей
+1. Connect to PostgreSQL
+2. Create a database schema based on Ent models
+3. Create a user
+4. Execute a query to retrieve users
 
-## Структура проекта
+## Project Structure
 
-- `ent/` - сгенерированный Ent код
-- `ent/schema/` - определения схем Ent
-- `main.go` - основной код приложения
-- `docker-compose.yml` - конфигурация Docker Compose для PostgreSQL
+- `ent/` - generated Ent code
+- `ent/schema/` - Ent schema definitions
+- `main.go` - main application code
+- `docker-compose.yml` - Docker Compose configuration for PostgreSQL
 
-## Добавление новых сущностей
+## Adding New Entities
 
-Для добавления новых сущностей используйте команду:
+To add new entities, use the command:
 
 ```bash
-go run -mod=mod entgo.io/ent/cmd/ent new ИмяСущности
+go run -mod=mod entgo.io/ent/cmd/ent new NameOfEntity
 ```
 
-После этого определите поля и связи в файле схемы (`ent/schema/имясущности.go`) и сгенерируйте код:
+Then define fields and relationships in the schema file (`ent/schema/nameOfEntity.go`) and generate the code:
 
 ```bash
 go generate ./ent

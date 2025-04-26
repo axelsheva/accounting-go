@@ -1,25 +1,17 @@
 {
   "version": "0.2",
-  "ignorePaths": [
-    "./go.mod",
-    "./go.sum"
-  ],
+  "ignorePaths": ["./go.mod", "./go.sum"],
   "dictionaryDefinitions": [],
   "dictionaries": [],
   "language": "en,ru,uk",
-  "words": [
-    "entsql",
-    "gonic",
-    "jsoniter",
-    "Nillable",
-    "sqlgraph"
-  ],
+  "words": ["entsql", "gonic", "jsoniter", "Nillable", "sqlgraph"],
   "ignoreWords": [
     "entgo",
     "healthcheck",
     "pg_isready",
     "sslmode",
-    "upserting"
+    "upserting",
+    "loadtest"
   ],
   "import": []
 }
