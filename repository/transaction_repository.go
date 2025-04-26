@@ -24,11 +24,39 @@ func NewTransactionRepository(client *ent.Client, balanceRepo *BalanceRepository
 	}
 }
 
-// Create creates a new transaction
+// Create creates a new transaction with SQL transaction
 func (r *TransactionRepository) Create(ctx context.Context, id string, userID int, amount float64,
 	currency string, txType transaction.Type) (*ent.Transaction, error) {
 
-	builder := r.client.Transaction.
+	// Start a transaction
+	tx, err := r.client.Tx(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed starting transaction: %w", err)
+	}
+
+	// Execute the actual logic within the transaction
+	transaction, err := r.createWithTx(ctx, tx, id, userID, amount, currency, txType)
+	if err != nil {
+		// Rollback the transaction in case of error
+		if err := tx.Rollback(); err != nil {
+			return nil, fmt.Errorf("rolling back transaction: %w (%v)", err, err)
+		}
+		return nil, err
+	}
+
+	// Commit the transaction
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("committing transaction: %w", err)
+	}
+
+	return transaction, nil
+}
+
+// CreateWithTx creates a new transaction within an existing DB transaction
+func (r *TransactionRepository) createWithTx(ctx context.Context, tx *ent.Tx, id string, userID int, amount float64,
+	currency string, txType transaction.Type) (*ent.Transaction, error) {
+
+	builder := tx.Transaction.
 		Create().
 		SetID(id).
 		SetUserID(userID).
@@ -37,24 +65,29 @@ func (r *TransactionRepository) Create(ctx context.Context, id string, userID in
 		SetType(txType).
 		SetCreatedAt(time.Now())
 
-	tx, err := builder.Save(ctx)
+	transaction, err := builder.Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating %s transaction: %w", txType, err)
 	}
 
 	var amountWithSign float64
-	if txType == transaction.TypeDeposit {
+	if txType == "deposit" {
 		amountWithSign = amount
 	} else {
 		amountWithSign = -amount
 	}
 
-	err = r.balanceRepo.Upsert(ctx, userID, currency, amountWithSign)
+	// Use the BalanceRepository with the transaction context
+	err = r.balanceRepo.UpsertWithTx(ctx, tx, UpsertBalanceParams{
+		UserID:   userID,
+		Currency: currency,
+		Amount:   amountWithSign,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	return tx, nil
+	return transaction, nil
 }
 
 // GetByID gets a transaction by its ID

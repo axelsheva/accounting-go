@@ -38,14 +38,3 @@ func (s *BalanceService) GetUserBalance(ctx context.Context, userID int, currenc
 	}
 	return balance, nil
 }
-
-// UpsertBalance creates or updates the balance of a user in a specified currency
-func (s *BalanceService) UpsertBalance(ctx context.Context, userID int, currency string, amount float64) error {
-	// Call the Upsert method from the repository
-	err := s.balanceRepo.Upsert(ctx, userID, currency, amount)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}

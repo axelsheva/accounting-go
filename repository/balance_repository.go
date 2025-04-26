@@ -39,50 +39,57 @@ func (r *BalanceRepository) GetByUserIDAndCurrency(ctx context.Context, userID i
 	return balance, nil
 }
 
-// Upsert creates a new balance or updates an existing one for a specified user and currency
-func (r *BalanceRepository) Upsert(ctx context.Context, userID int, currency string, amount float64) error {
-	updated, err := r.client.Balance.
+// UpsertBalanceParams represents the parameters for the UpsertWithTx method
+type UpsertBalanceParams struct {
+	UserID   int
+	Currency string
+	Amount   float64
+}
+
+// UpsertWithTx creates or updates a balance within an existing DB transaction
+func (r *BalanceRepository) UpsertWithTx(ctx context.Context, tx *ent.Tx, params UpsertBalanceParams) error {
+	updated, err := tx.Balance.
 		Update().
 		Where(
-			balance.UserID(userID),
-			balance.CurrencyEQ(currency),
+			balance.UserID(params.UserID),
+			balance.CurrencyEQ(params.Currency),
 		).
-		AddAmount(amount).
+		AddAmount(params.Amount).
 		SetUpdatedAt(time.Now()).
 		Save(ctx)
+	if updated != 0 {
+		return nil
+	}
 	if err != nil {
 		if errors.IsNegativeBalanceConstraintError(err) {
 			return errors.ErrInsufficientFunds
 		}
 
-		return fmt.Errorf("failed upserting %s balance: %w", currency, err)
-	}
-	if updated != 0 {
-		return nil
+		return fmt.Errorf("failed upserting %s balance: %w", params.Currency, err)
 	}
 
 	// If the balance is not found, create a new one
 	if updated == 0 {
-		if amount < 0 {
-			return fmt.Errorf("failed creating %s balance: %w", currency, err)
+		if params.Amount < 0 {
+			return fmt.Errorf("failed creating %s balance: insufficient initial funds", params.Currency)
 		}
 
-		_, err = r.client.Balance.
+		_, err = tx.Balance.
 			Create().
-			SetUserID(userID).
-			SetCurrency(currency).
-			SetAmount(amount).
+			SetUserID(params.UserID).
+			SetCurrency(params.Currency).
+			SetAmount(params.Amount).
 			SetCreatedAt(time.Now()).
 			SetUpdatedAt(time.Now()).
 			Save(ctx)
 		if err != nil {
-			return fmt.Errorf("failed creating %s balance: %w", currency, err)
+			return fmt.Errorf("failed creating %s balance: %w", params.Currency, err)
 		}
 		return nil
 	}
 
 	// If another error occurred
-	return fmt.Errorf("failed upserting %s balance: %w", currency, err)
+	return fmt.Errorf("failed upserting %s balance: %w", params.Currency, err)
 }
 
 // GetAllByUserID returns all balances of a user
